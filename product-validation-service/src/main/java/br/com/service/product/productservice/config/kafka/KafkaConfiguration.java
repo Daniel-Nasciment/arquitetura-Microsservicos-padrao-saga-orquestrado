@@ -43,10 +43,10 @@ public class KafkaConfiguration {
 
     @Bean
     public ProducerFactory<String, String> producerFactory(){
-        return new DefaultKafkaProducerFactory<>(consumertProps());
+        return new DefaultKafkaProducerFactory<>(producerProps());
     }
 
-    private Map<String, Object> consumertProps() {
+    private Map<String, Object> producerProps() {
         return Map.of(
                 ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
                 ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
