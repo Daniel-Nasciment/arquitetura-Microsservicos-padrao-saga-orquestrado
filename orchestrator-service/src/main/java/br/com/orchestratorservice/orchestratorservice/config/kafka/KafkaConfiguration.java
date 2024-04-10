@@ -1,6 +1,7 @@
 package br.com.orchestratorservice.orchestratorservice.config.kafka;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -9,15 +10,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
 
 import java.util.Map;
+
+import static br.com.orchestratorservice.orchestratorservice.topics.ETopics.*;
 
 
 @EnableKafka
 @Configuration
 @RequiredArgsConstructor
 public class KafkaConfiguration {
+
+    private static final int REPLICAS_COUNT = 1;
+    private static final int PARTITIONS_COUNT = 1;
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
@@ -57,6 +64,59 @@ public class KafkaConfiguration {
     @Bean
     public KafkaTemplate<String, String> kafkaTemplate(ProducerFactory<String, String> producerFactory){
         return new KafkaTemplate<>(producerFactory);
+    }
+
+    private NewTopic buildTopic(String name){
+        return TopicBuilder
+                .name(name)
+                .replicas(REPLICAS_COUNT)
+                .partitions(PARTITIONS_COUNT)
+                .build();
+    }
+
+    @Bean
+    public NewTopic buildStartSagaTopic(){
+        return buildTopic(START_SAGA.getTopic());
+    }
+    @Bean
+    public NewTopic buildBaseOrchestratorTopic(){
+        return buildTopic(BASE_ORCHESTRATOR.getTopic());
+    }
+    @Bean
+    public NewTopic buildFinishSucessTopic(){
+        return buildTopic(FINISH_SUCCESS.getTopic());
+    }
+    @Bean
+    public NewTopic buildFinishFailTopic(){
+        return buildTopic(FINISH_FAIL.getTopic());
+    }
+    @Bean
+    public NewTopic buildProductValidationSucessTopic(){
+        return buildTopic(PRODUCT_VALIDATION_SUCESS.getTopic());
+    }
+    @Bean
+    public NewTopic buildProductValidationFailTopic(){
+        return buildTopic(PRODUCT_VALIDATION_FAIL.getTopic());
+    }
+    @Bean
+    public NewTopic buildPaymentSuccessTopic(){
+        return buildTopic(PAYMENT_SUCESS.getTopic());
+    }
+    @Bean
+    public NewTopic buildPaymentFailTopic(){
+        return buildTopic(PAYMENT_FAIL.getTopic());
+    }
+    @Bean
+    public NewTopic buildInventorySucessTopic(){
+        return buildTopic(INVENTORY_SUCESS.getTopic());
+    }
+    @Bean
+    public NewTopic buildInventoryFailTopic(){
+        return buildTopic(INVENTORY_FAIL.getTopic());
+    }
+    @Bean
+    public NewTopic buildNotifyEndingTopic(){
+        return buildTopic(NOTIFY_ENDING.getTopic());
     }
 
 }
