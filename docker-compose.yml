@@ -89,6 +89,90 @@ services:
     depends_on:
       - "kafka"
 
+  order-service:
+    container_name: order-service
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    environment:
+      MONGO_HOST: mongodb://admin:admin@order-db:27017/order-db
+      BROKER_KAFKA: kafka:29092
+    networks:
+      - orchestrator-saga
+    depends_on:
+      - order-db
+      - kafka
+    ports:
+      - 3000:3000
+
+  product-validation-service:
+    container_name: product-validation-service
+    build:
+      context: ./product-validation-service
+      dockerfile: Dockerfile
+    environment:
+      PG_HOST: jdbc:postgresql://product-db:5432/product-db
+      PG_USER: admin
+      PG_PASSWORD: admin
+      BROKER_KAFKA: kafka:29092
+    networks:
+      - orchestrator-saga
+    depends_on:
+      - product-db
+      - kafka
+    ports:
+      - 8090:8090
+
+  payment-service:
+    container_name: payment-service
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    environment:
+      PG_HOST: jdbc:postgresql://payment-db:5432/payment-db
+      PG_USER: admin
+      PG_PASSWORD: admin
+      BROKER_KAFKA: kafka:29092
+    networks:
+      - orchestrator-saga
+    depends_on:
+      - payment-db
+      - kafka
+    ports:
+      - 8091:8091
+
+  inventory-service:
+    container_name: inventory-service
+    build:
+      context: ./inventory-service
+      dockerfile: Dockerfile
+    environment:
+      PG_HOST: jdbc:postgresql://inventory-db:5432/inventory-db
+      PG_USER: admin
+      PG_PASSWORD: admin
+      BROKER_KAFKA: kafka:29092
+    networks:
+      - orchestrator-saga
+    depends_on:
+      - inventory-db
+      - kafka
+    ports:
+      - 8092:8092
+
+  orchestrator-service:
+    container_name: orchestrator-service
+    build:
+      context: ./orchestrator-service
+      dockerfile: Dockerfile
+    environment:
+      BROKER_KAFKA: kafka:29092
+    networks:
+      - orchestrator-saga
+    depends_on:
+      - kafka
+    ports:
+      - 8080:8080
+
 networks:
   orchestrator-saga:
     driver: bridge

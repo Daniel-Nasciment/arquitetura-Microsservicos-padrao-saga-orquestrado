@@ -1,4 +1,4 @@
 FROM openjdk:17-alpine
-COPY build/libs/*.jar app.jar
+COPY target/*.jar app.jar
 EXPOSE 3000
 ENTRYPOINT ["java", "-jar", "app.jar"]
