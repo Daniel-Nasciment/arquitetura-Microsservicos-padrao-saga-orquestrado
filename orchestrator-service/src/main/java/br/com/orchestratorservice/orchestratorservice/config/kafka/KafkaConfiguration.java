@@ -15,7 +15,7 @@ import org.springframework.kafka.core.*;
 
 import java.util.Map;
 
-import static br.com.orchestratorservice.orchestratorservice.topics.ETopics.*;
+import static br.com.orchestratorservice.orchestratorservice.core.enums.ETopics.*;
 
 
 @EnableKafka
