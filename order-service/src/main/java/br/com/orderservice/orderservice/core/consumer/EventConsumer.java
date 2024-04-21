@@ -1,6 +1,7 @@
 package br.com.orderservice.orderservice.core.consumer;
 
 import br.com.orderservice.orderservice.core.document.Event;
+import br.com.orderservice.orderservice.core.service.EventService;
 import br.com.orderservice.orderservice.core.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class EventConsumer {
 
     private final JsonUtil jsonUtil;
+    private final EventService eventService;
 
     @KafkaListener(
             groupId = "${spring.kafka.consumer.group-id}",
@@ -22,6 +24,6 @@ public class EventConsumer {
     public void consumeNotifyEndingEvent(String payload) throws JsonProcessingException {
         log.info("Receiving ending notfication event {} from notify-ending topic", payload);
         Event event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+        eventService.notifyEnding(event);
     }
 }
