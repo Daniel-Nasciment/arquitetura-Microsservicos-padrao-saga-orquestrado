@@ -1,4 +1,4 @@
-package br.com.orderservice.orderservice.core.dto;
+package br.com.orderservice.orderservice.core.document;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

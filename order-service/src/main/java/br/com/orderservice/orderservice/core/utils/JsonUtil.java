@@ -1,6 +1,6 @@
 package br.com.orderservice.orderservice.core.utils;
 
-import br.com.orderservice.orderservice.core.dto.Event;
+import br.com.orderservice.orderservice.core.document.Event;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;

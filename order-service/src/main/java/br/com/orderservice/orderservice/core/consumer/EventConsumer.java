@@ -1,6 +1,6 @@
 package br.com.orderservice.orderservice.core.consumer;
 
-import br.com.orderservice.orderservice.core.dto.Event;
+import br.com.orderservice.orderservice.core.document.Event;
 import br.com.orderservice.orderservice.core.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
