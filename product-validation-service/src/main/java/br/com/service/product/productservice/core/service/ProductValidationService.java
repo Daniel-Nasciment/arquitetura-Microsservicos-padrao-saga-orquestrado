@@ -16,8 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
-import static br.com.service.product.productservice.core.enums.ESagaStatus.SUCCESS;
+import static br.com.service.product.productservice.core.enums.ESagaStatus.*;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
 @Service
@@ -94,9 +95,6 @@ public class ProductValidationService {
         validationRepository.save(validation);
     }
 
-    private void handleFailCurrentNotExecuted(Event event, String message) {
-    }
-
     private void handleSuccess(Event event) {
         event.setStatus(SUCCESS);
         event.setSource(CURRENT_SOURCE);
@@ -114,7 +112,30 @@ public class ProductValidationService {
     }
 
 
+    private void handleFailCurrentNotExecuted(Event event, String message) {
+        event.setStatus(ROLLBACK_PENDING);
+        event.setSource(CURRENT_SOURCE);
+        addHistory(event, "Fail to validate products: ".concat(message));
+    }
 
+    public void rollbackEvent(Event event) throws JsonProcessingException {
+        changeValidationToFail(event);
+        event.setStatus(FAIL);
+        event.setSource(CURRENT_SOURCE);
+        addHistory(event, "Rollback executed on product validation!");
+        kafkaProducer.sendEvent(jsonUtil.toJson(event));
+    }
+
+    private void changeValidationToFail(Event event) {
+        validationRepository.findByOrderIdAndTransactionId(event.getPayload().getId(), event.getTransactionId()).ifPresentOrElse(
+                validation -> {
+                    validation.setSuccess(false);
+                    validationRepository.save(validation);
+                },
+                () -> createValidation(event, false)
+        );
+
+    }
 
 
 }

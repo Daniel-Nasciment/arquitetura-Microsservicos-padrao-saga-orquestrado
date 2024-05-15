@@ -1,6 +1,7 @@
 package br.com.service.product.productservice.core.consumer;
 
 import br.com.service.product.productservice.core.dto.Event;
+import br.com.service.product.productservice.core.service.ProductValidationService;
 import br.com.service.product.productservice.core.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class ProductValidationConsumer {
 
     private final JsonUtil jsonUtil;
+    private final ProductValidationService productValidationService;
 
 
     @KafkaListener(
@@ -23,7 +25,7 @@ public class ProductValidationConsumer {
     public void consumeSuccessEvent(String payload) throws JsonProcessingException {
         log.info("Receiving success event {} from product-validation-success topic", payload);
         Event event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+        productValidationService.validateExistingProducts(event);
     }
 
     @KafkaListener(
@@ -33,6 +35,6 @@ public class ProductValidationConsumer {
     public void consumeFailEvent(String payload) throws JsonProcessingException {
         log.info("Receiving rollback event {} from product-validation-fail topic", payload);
         Event event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+        productValidationService.rollbackEvent(event);
     }
 }
