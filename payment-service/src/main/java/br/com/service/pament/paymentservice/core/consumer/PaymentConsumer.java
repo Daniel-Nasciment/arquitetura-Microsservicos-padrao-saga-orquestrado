@@ -1,6 +1,7 @@
 package br.com.service.pament.paymentservice.core.consumer;
 
 import br.com.service.pament.paymentservice.core.dto.Event;
+import br.com.service.pament.paymentservice.core.service.PaymentService;
 import br.com.service.pament.paymentservice.core.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class PaymentConsumer {
 
     private final JsonUtil jsonUtil;
+    private final PaymentService paymentService;
 
 
     @KafkaListener(
@@ -23,7 +25,7 @@ public class PaymentConsumer {
     public void consumeSuccessEvent(String payload) throws JsonProcessingException {
         log.info("Receiving success event {} from payment-success topic", payload);
         Event event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+        paymentService.realizePayment(event);
     }
 
     @KafkaListener(
@@ -33,6 +35,6 @@ public class PaymentConsumer {
     public void consumeFailEvent(String payload) throws JsonProcessingException {
         log.info("Receiving rollback event {} from payment-fail topic", payload);
         Event event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+        paymentService.realizeRefound(event);
     }
 }

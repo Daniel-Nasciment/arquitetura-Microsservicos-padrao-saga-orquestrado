@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+import static br.com.service.pament.paymentservice.core.enums.EPaymentStatus.REFOUND;
 import static br.com.service.pament.paymentservice.core.enums.EPaymentStatus.SUCCESS;
 import static br.com.service.pament.paymentservice.core.enums.ESagaStatus.FAIL;
 import static br.com.service.pament.paymentservice.core.enums.ESagaStatus.ROLLBACK_PENDING;
@@ -44,6 +45,7 @@ public class PaymentService {
             handleSuccess(event);
         }catch (Exception ex) {
             log.error("Error trying to make payment: ", ex);
+            handleFailCurrentNotExecuted(event, ex.getMessage());
         }
         kafkaProducer.sendEvent(jsonUtil.toJson(event));
 
@@ -139,17 +141,23 @@ public class PaymentService {
     private void handleFailCurrentNotExecuted(Event event, String message) {
         event.setStatus(ROLLBACK_PENDING);
         event.setSource(CURRENT_SOURCE);
-        addHistory(event, "Fail to make payment: ".concat(message));
+        addHistory(event, "Fail to realize payment: ".concat(message));
     }
 
 
-    public void rollbackEvent(Event event) throws JsonProcessingException {
-        //changeValidationToFail(event);
+    public void realizeRefound(Event event) throws JsonProcessingException {
+        changePaymentStatusToRefound(event);
         event.setStatus(FAIL);
         event.setSource(CURRENT_SOURCE);
-        addHistory(event, "Rollback executed on product validation!");
+        addHistory(event, "Rollback executed for payment!");
         kafkaProducer.sendEvent(jsonUtil.toJson(event));
     }
 
+    private void changePaymentStatusToRefound(Event event) {
+        Payment payment = findByOrderIdAndTransactionId(event);
+        payment.setStatus(REFOUND);
+        setEventAmountItems(event, payment);
+        save(payment);
+    }
 
 }
