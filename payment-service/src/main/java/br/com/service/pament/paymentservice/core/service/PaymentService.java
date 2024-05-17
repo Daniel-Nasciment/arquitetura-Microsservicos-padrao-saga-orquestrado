@@ -75,6 +75,7 @@ public class PaymentService {
                 .build();
 
         setEventAmountItems(event, payment);
+        save(payment);
 
     }
 
