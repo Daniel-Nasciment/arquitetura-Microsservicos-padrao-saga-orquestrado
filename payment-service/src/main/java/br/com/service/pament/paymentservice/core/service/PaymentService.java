@@ -147,10 +147,18 @@ public class PaymentService {
 
 
     public void realizeRefound(Event event) throws JsonProcessingException {
-        changePaymentStatusToRefound(event);
         event.setStatus(FAIL);
         event.setSource(CURRENT_SOURCE);
-        addHistory(event, "Rollback executed for payment!");
+
+        try {
+            changePaymentStatusToRefound(event);
+            addHistory(event, "Rollback executed for payment!");
+        }catch (Exception ex) {
+            log.error( "Rollback not executed for payment: ", ex);
+            addHistory(event, "Rollback not executed for payment: ".concat(ex.getMessage()));
+        }
+
+
         kafkaProducer.sendEvent(jsonUtil.toJson(event));
     }
 
