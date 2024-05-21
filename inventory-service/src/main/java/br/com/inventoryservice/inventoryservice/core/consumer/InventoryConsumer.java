@@ -2,6 +2,7 @@ package br.com.inventoryservice.inventoryservice.core.consumer;
 
 
 import br.com.inventoryservice.inventoryservice.core.dto.Event;
+import br.com.inventoryservice.inventoryservice.core.service.InventoryService;
 import br.com.inventoryservice.inventoryservice.core.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 public class InventoryConsumer {
 
     private final JsonUtil jsonUtil;
+    private final InventoryService inventoryService;
 
 
     @KafkaListener(
@@ -24,7 +26,7 @@ public class InventoryConsumer {
     public void consumeSuccessEvent(String payload) throws JsonProcessingException {
         log.info("Receiving success event {} from inventory-success topic", payload);
         Event event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+        inventoryService.updateInventory(event);
     }
 
     @KafkaListener(
@@ -34,6 +36,6 @@ public class InventoryConsumer {
     public void consumeFailEvent(String payload) throws JsonProcessingException {
         log.info("Receiving rollback event {} from inventory-fail topic", payload);
         Event event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+        inventoryService.rollbackInventory(event);
     }
 }
