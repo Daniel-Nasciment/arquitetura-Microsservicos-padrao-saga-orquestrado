@@ -11,7 +11,7 @@ public enum ETopics {
     BASE_ORCHESTRATOR("orchestrator"),
     FINISH_SUCCESS("finish-success"),
     FINISH_FAIL("finish-fail"),
-    PRODUCT_VALIDATION_SUCESS("product-validation-success"),
+    PRODUCT_VALIDATION_SUCCESS("product-validation-success"),
     PRODUCT_VALIDATION_FAIL("product-validation-fail"),
     PAYMENT_SUCESS("payment-success"),
     PAYMENT_FAIL("payment-fail"),
