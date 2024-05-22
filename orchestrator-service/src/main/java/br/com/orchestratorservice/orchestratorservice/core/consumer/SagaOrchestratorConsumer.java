@@ -2,6 +2,7 @@ package br.com.orchestratorservice.orchestratorservice.core.consumer;
 
 import br.com.orchestratorservice.orchestratorservice.core.dto.Event;
 import br.com.orchestratorservice.orchestratorservice.core.utils.JsonUtil;
+import br.com.orchestratorservice.orchestratorservice.service.OrchestratorService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class SagaOrchestratorConsumer {
 
     private final JsonUtil jsonUtil;
+    private final OrchestratorService orchestratorService;
 
     @KafkaListener(
             groupId = "${spring.kafka.consumer.group-id}",
@@ -21,8 +23,7 @@ public class SagaOrchestratorConsumer {
     )
     public void consumeStartSagaEvent(String payload) throws JsonProcessingException {
         log.info("Receiving event {} from start-saga topic", payload);
-        Event event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+        orchestratorService.startSaga(jsonUtil.toEvent(payload));
     }
 
     @KafkaListener(
@@ -31,8 +32,7 @@ public class SagaOrchestratorConsumer {
     )
     public void consumeOrchestratorEvent(String payload) throws JsonProcessingException {
         log.info("Receiving event {} from orchestrator topic", payload);
-        Event event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+        orchestratorService.continueSaga(jsonUtil.toEvent(payload));
     }
 
     @KafkaListener(
@@ -41,8 +41,7 @@ public class SagaOrchestratorConsumer {
     )
     public void consumeFinishSuccessEvent(String payload) throws JsonProcessingException {
         log.info("Receiving event {} from finish-success topic", payload);
-        Event event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+       orchestratorService.finishSagaSuccess(jsonUtil.toEvent(payload));
     }
 
     @KafkaListener(
@@ -51,7 +50,6 @@ public class SagaOrchestratorConsumer {
     )
     public void consumeFinishFailEvent(String payload) throws JsonProcessingException {
         log.info("Receiving event {} from finish-fail topic", payload);
-        Event event = jsonUtil.toEvent(payload);
-        log.info(event.toString());
+        orchestratorService.finishSagaFail(jsonUtil.toEvent(payload));
     }
 }
