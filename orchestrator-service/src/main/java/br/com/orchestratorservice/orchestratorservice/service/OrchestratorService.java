@@ -3,7 +3,6 @@ package br.com.orchestratorservice.orchestratorservice.service;
 import br.com.orchestratorservice.orchestratorservice.core.consumer.SagaOrchestratorConsumer;
 import br.com.orchestratorservice.orchestratorservice.core.dto.Event;
 import br.com.orchestratorservice.orchestratorservice.core.dto.History;
-import br.com.orchestratorservice.orchestratorservice.core.enums.EEventSource;
 import br.com.orchestratorservice.orchestratorservice.core.enums.ETopics;
 import br.com.orchestratorservice.orchestratorservice.core.producer.SagaOrchestratorProducer;
 import br.com.orchestratorservice.orchestratorservice.core.saga.SagaExecutionController;
@@ -11,7 +10,6 @@ import br.com.orchestratorservice.orchestratorservice.core.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -28,7 +26,6 @@ public class OrchestratorService {
 
     private final JsonUtil jsonUtil;
     private final SagaOrchestratorProducer producer;
-    private final SagaOrchestratorConsumer consumer;
     private final SagaExecutionController sec;
 
     public void startSaga(Event event) throws JsonProcessingException {
