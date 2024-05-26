@@ -1,4 +1,4 @@
-package br.com.orchestratorservice.orchestratorservice.service;
+package br.com.orchestratorservice.orchestratorservice.core.service;
 
 import br.com.orchestratorservice.orchestratorservice.core.consumer.SagaOrchestratorConsumer;
 import br.com.orchestratorservice.orchestratorservice.core.dto.Event;

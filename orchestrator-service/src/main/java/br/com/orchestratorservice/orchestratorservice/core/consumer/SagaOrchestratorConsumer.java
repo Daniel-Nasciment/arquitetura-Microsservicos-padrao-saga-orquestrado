@@ -1,8 +1,7 @@
 package br.com.orchestratorservice.orchestratorservice.core.consumer;
 
-import br.com.orchestratorservice.orchestratorservice.core.dto.Event;
 import br.com.orchestratorservice.orchestratorservice.core.utils.JsonUtil;
-import br.com.orchestratorservice.orchestratorservice.service.OrchestratorService;
+import br.com.orchestratorservice.orchestratorservice.core.service.OrchestratorService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
