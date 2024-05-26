@@ -7,7 +7,7 @@ services:
     image: mongo:latest
     restart: always
     networks:
-      - orchestrator-saga
+      - choreography-saga
     ports:
       - 27017:27017
 
@@ -15,7 +15,7 @@ services:
     container_name: product-db
     image: postgres:latest
     networks:
-      - orchestrator-saga
+      - choreography-saga
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
@@ -27,7 +27,7 @@ services:
     container_name: payment-db
     image: postgres:latest
     networks:
-      - orchestrator-saga
+      - choreography-saga
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
@@ -39,7 +39,7 @@ services:
     container_name: inventory-db
     image: postgres:latest
     networks:
-      - orchestrator-saga
+      - choreography-saga
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
@@ -55,7 +55,7 @@ services:
       - "2181:2181"
       - "9092:9092"
     networks:
-      - orchestrator-saga
+      - choreography-saga
     environment:
       KAFKA_LISTENERS: "INTERNAL://:29092,EXTERNAL://:9092"
       KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka:29092,EXTERNAL://localhost:9092"
@@ -77,7 +77,7 @@ services:
     ports:
       - "8081:8080"
     networks:
-      - orchestrator-saga
+      - choreography-saga
     environment:
       CONFIG_FILEPATH: /tmp/config.yml
       CONSOLE_CONFIG_FILE: |
@@ -95,7 +95,7 @@ services:
       MONGO_HOST: mongodb://order-db:27017/order
       BROKER_KAFKA: kafka:29092
     networks:
-      - orchestrator-saga
+      - choreography-saga
     depends_on:
       - order-db
       - kafka
@@ -113,7 +113,7 @@ services:
       PG_PASSWORD: admin
       BROKER_KAFKA: kafka:29092
     networks:
-      - orchestrator-saga
+      - choreography-saga
     depends_on:
       - product-db
       - kafka
@@ -131,7 +131,7 @@ services:
       PG_PASSWORD: admin
       BROKER_KAFKA: kafka:29092
     networks:
-      - orchestrator-saga
+      - choreography-saga
     depends_on:
       - payment-db
       - kafka
@@ -149,27 +149,13 @@ services:
       PG_PASSWORD: admin
       BROKER_KAFKA: kafka:29092
     networks:
-      - orchestrator-saga
+      - choreography-saga
     depends_on:
       - inventory-db
       - kafka
     ports:
       - 8092:8092
 
-  orchestrator-service:
-    container_name: orchestrator-service
-    build:
-      context: ./orchestrator-service
-      dockerfile: Dockerfile
-    environment:
-      BROKER_KAFKA: kafka:29092
-    networks:
-      - orchestrator-saga
-    depends_on:
-      - kafka
-    ports:
-      - 8080:8080
-
 networks:
-  orchestrator-saga:
+  choreography-saga:
     driver: bridge
