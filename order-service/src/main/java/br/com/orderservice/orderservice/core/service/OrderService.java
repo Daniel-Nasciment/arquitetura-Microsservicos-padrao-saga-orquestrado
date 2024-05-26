@@ -35,18 +35,9 @@ public class OrderService {
                 )
                 .build();
         Order orderSaved = orderRepository.save(order);
-        producer.sendEvent(jsonUtil.toJson(createPayload(orderSaved)));
+        producer.sendEvent(jsonUtil.toJson(eventService.createEvent(orderSaved)));
         return orderSaved;
     }
 
-    private Event createPayload(Order order){
-        Event event = Event.builder()
-                .orderId(order.getId())
-                .transactionId(order.getTransactionId())
-                .payload(order)
-                .createdAt(LocalDateTime.now())
-                .build();
-        return eventService.save(event);
-    }
 
 }

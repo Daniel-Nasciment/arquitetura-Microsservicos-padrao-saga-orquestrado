@@ -47,7 +47,7 @@ public class PaymentService {
             log.error("Error trying to make payment: ", ex);
             handleFailCurrentNotExecuted(event, ex.getMessage());
         }
-        kafkaProducer.sendEvent(jsonUtil.toJson(event));
+        kafkaProducer.sendEvent(jsonUtil.toJson(event), "");
 
     }
 
@@ -159,7 +159,7 @@ public class PaymentService {
         }
 
 
-        kafkaProducer.sendEvent(jsonUtil.toJson(event));
+        kafkaProducer.sendEvent(jsonUtil.toJson(event), "");
     }
 
     private void changePaymentStatusToRefound(Event event) {

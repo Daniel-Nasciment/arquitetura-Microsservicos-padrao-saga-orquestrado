@@ -40,7 +40,7 @@ public class InventoryService {
             log.error("Error trying to update inventory: ", ex);
             handleFailCurrentNotExecuted(event, ex.getMessage());
         }
-        kafkaProducer.sendEvent(jsonUtil.toJson(event));
+        kafkaProducer.sendEvent(jsonUtil.toJson(event), "");
     }
 
     private void updateInventory(Order order) {
@@ -127,7 +127,7 @@ public class InventoryService {
         }
 
 
-        kafkaProducer.sendEvent(jsonUtil.toJson(event));
+        kafkaProducer.sendEvent(jsonUtil.toJson(event), "");
     }
 
     private void returnInventoryToPreviousValues(Event event) {
