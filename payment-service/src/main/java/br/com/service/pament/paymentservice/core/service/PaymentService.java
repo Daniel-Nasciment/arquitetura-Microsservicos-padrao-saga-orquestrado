@@ -9,6 +9,7 @@ import br.com.service.pament.paymentservice.core.enums.ESagaStatus;
 import br.com.service.pament.paymentservice.core.model.Payment;
 import br.com.service.pament.paymentservice.core.producer.KafkaProducer;
 import br.com.service.pament.paymentservice.core.repository.PaymentRepository;
+import br.com.service.pament.paymentservice.core.saga.SagaExecutionController;
 import br.com.service.pament.paymentservice.core.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
@@ -30,9 +31,8 @@ public class PaymentService {
     private static final String CURRENT_SOURCE = "PAYMENT_SERVICE";
     public static final Double REDUCE_SUM_VALUE = 0.0;
     public static final Double MIN_AMOUNT_VALUE = 0.1;
-    private final KafkaProducer kafkaProducer;
-    private final JsonUtil jsonUtil;
     private final PaymentRepository paymentRepository;
+    private final SagaExecutionController sagaExecutionController;
 
     public void realizePayment(Event event) throws JsonProcessingException {
 
@@ -47,7 +47,7 @@ public class PaymentService {
             log.error("Error trying to make payment: ", ex);
             handleFailCurrentNotExecuted(event, ex.getMessage());
         }
-        kafkaProducer.sendEvent(jsonUtil.toJson(event), "");
+        this.sagaExecutionController.handleSaga(event);
 
     }
 
@@ -159,7 +159,7 @@ public class PaymentService {
         }
 
 
-        kafkaProducer.sendEvent(jsonUtil.toJson(event), "");
+        this.sagaExecutionController.handleSaga(event);
     }
 
     private void changePaymentStatusToRefound(Event event) {

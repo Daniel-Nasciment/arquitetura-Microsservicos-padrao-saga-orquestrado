@@ -8,6 +8,7 @@ import br.com.inventoryservice.inventoryservice.core.modelo.OrderInventory;
 import br.com.inventoryservice.inventoryservice.core.producer.KafkaProducer;
 import br.com.inventoryservice.inventoryservice.core.repository.InventoryRepository;
 import br.com.inventoryservice.inventoryservice.core.repository.OrderInventoryRepository;
+import br.com.inventoryservice.inventoryservice.core.saga.SagaExecutionController;
 import br.com.inventoryservice.inventoryservice.core.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
@@ -25,10 +26,9 @@ import static br.com.inventoryservice.inventoryservice.core.enums.ESagaStatus.RO
 public class InventoryService {
 
     private static final String CURRENT_SOURCE = "INVENTORY_SERVICE";
-    private JsonUtil jsonUtil;
-    private KafkaProducer kafkaProducer;
     private InventoryRepository inventoryRepository;
     private OrderInventoryRepository orderInventoryRepository;
+    private final SagaExecutionController sagaExecutionController;
 
     public void updateInventory(Event event) throws JsonProcessingException {
         try {
@@ -40,7 +40,7 @@ public class InventoryService {
             log.error("Error trying to update inventory: ", ex);
             handleFailCurrentNotExecuted(event, ex.getMessage());
         }
-        kafkaProducer.sendEvent(jsonUtil.toJson(event), "");
+        this.sagaExecutionController.handleSaga(event);
     }
 
     private void updateInventory(Order order) {
@@ -126,8 +126,7 @@ public class InventoryService {
             addHistory(event, "Rollback not executed for inventory: ".concat(ex.getMessage()));
         }
 
-
-        kafkaProducer.sendEvent(jsonUtil.toJson(event), "");
+        this.sagaExecutionController.handleSaga(event);
     }
 
     private void returnInventoryToPreviousValues(Event event) {

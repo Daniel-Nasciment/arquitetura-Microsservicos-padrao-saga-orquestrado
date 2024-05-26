@@ -9,6 +9,7 @@ import br.com.service.product.productservice.core.model.Validation;
 import br.com.service.product.productservice.core.producer.KafkaProducer;
 import br.com.service.product.productservice.core.repository.ProductRepository;
 import br.com.service.product.productservice.core.repository.ValidationRepository;
+import br.com.service.product.productservice.core.saga.SagaExecutionController;
 import br.com.service.product.productservice.core.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
@@ -28,8 +29,7 @@ public class ProductValidationService {
 
     private static final String CURRENT_SOURCE = "PRODUCT_VALIDATION_SERVICE";
 
-    private final KafkaProducer kafkaProducer;
-    private final JsonUtil jsonUtil;
+    private final SagaExecutionController sagaExecutionController;
     private final ProductRepository productRepository;
     private final ValidationRepository validationRepository;
 
@@ -46,7 +46,7 @@ public class ProductValidationService {
             log.error("Error trying to validate products: ", ex);
             handleFailCurrentNotExecuted(event, ex.getMessage());
         }
-        kafkaProducer.sendEvent(jsonUtil.toJson(event), "");
+        sagaExecutionController.handleSaga(event);
     }
 
     private void checkCurrentValidation(Event event) {
@@ -123,7 +123,7 @@ public class ProductValidationService {
         event.setStatus(FAIL);
         event.setSource(CURRENT_SOURCE);
         addHistory(event, "Rollback executed on product validation!");
-        kafkaProducer.sendEvent(jsonUtil.toJson(event), "");
+        sagaExecutionController.handleSaga(event);
     }
 
     private void changeValidationToFail(Event event) {
